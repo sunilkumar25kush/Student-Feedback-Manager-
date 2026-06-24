@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Feedback | Brutalist</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="main.js" defer></script>
+</head>
+<body class="index-page">
+    <div class="container">
+        <h1 class="form-title">Feedback Manager</h1>
+        <nav><a href="feedbacks.html" class="nav-green">👀 View All Feedbacks</a></nav>
+        
+        <form id="feedbackForm">
+            <label>Name:</label>
+            <input type="text" id="name" placeholder="John Doe" required>
+            
+            <label>Rating:</label>
+            <select id="rating" required>
+                <option value="" disabled selected>Select Rating</option>
+                <option value="5">⭐⭐⭐⭐⭐ - Excellent</option>
+                <option value="4">⭐⭐⭐⭐ - Good</option>
+                <option value="3">⭐⭐⭐ - Average</option>
+                <option value="2">⭐⭐ - Poor</option>
+                <option value="1">⭐ - Terrible</option>
+            </select>
+            
+            <label>Comment:</label>
+            <textarea id="comment" placeholder="What's on your mind?" rows="4" required></textarea>
+            
+            <button type="submit">Submit Feedback 🚀</button>
+        </form>
+        <p id="statusMsg"></p>
+    </div>
+</body>
+</html>
