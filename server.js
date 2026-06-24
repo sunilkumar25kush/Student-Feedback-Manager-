@@ -4,12 +4,13 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json()); // To parse JSON data
-app.use(express.static('public')); // Serve static HTML files from 'public' folder
+
+// 🔴 CHANGE 1: Ab saari HTML/CSS files main folder mein hain, isliye '__dirname' use karenge
+app.use(express.static(__dirname)); 
 
 // MongoDB Connection
 mongoose.connect('mongodb+srv://sunil:1ogwCTvn31VAlpSP@first-backend.9jnkact.mongodb.net/studentFeedbackDB')
@@ -29,6 +30,11 @@ const Feedback = mongoose.model('Feedback', feedbackSchema);
 // ==========================================
 // ROUTES (The Flow of Data)
 // ==========================================
+
+// 🔴 CHANGE 2: Vercel par "Cannot GET /" hatane ke liye Homepage Route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // 1. POST Route: Save Feedback
 app.post('/api/feedback', async (req, res) => {
@@ -52,7 +58,11 @@ app.get('/api/feedback', async (req, res) => {
   }
 });
 
-// Start Server
+// Start Server (Local ke liye)
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+
+// 🔴 CHANGE 3: Vercel ke Serverless Function ke liye app export karna zaroori hai
+module.exports = app;
