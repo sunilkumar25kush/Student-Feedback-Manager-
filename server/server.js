@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+require("dotenv").config();
+
 
 const app = express();
 
@@ -16,9 +18,7 @@ app.get("/", (req, res) => {
 
 // MongoDB Connection
 mongoose
-  .connect(
-    "mongodb+srv://sunil:1ogwCTvn31VAlpSP@first-backend.9jnkact.mongodb.net/studentFeedbackDB"
-  )
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log("❌ DB Connection Error:", err));
 
