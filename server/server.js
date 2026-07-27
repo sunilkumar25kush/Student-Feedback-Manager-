@@ -2,8 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
-require("dotenv").config();
+const fs = require("fs");
 
+const envPath = fs.existsSync(path.join(__dirname, ".env"))
+  ? path.join(__dirname, ".env")
+  : path.join(__dirname, "../.env");
+require("dotenv").config({ path: envPath });
 
 const app = express();
 
@@ -15,6 +19,8 @@ app.use(express.static(path.join(__dirname, "../client")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client", "index.html"));
 });
+
+console.log("Mongo URI loaded:", process.env.MONGO_URI ? "YES" : "NO");
 
 // MongoDB Connection
 mongoose
@@ -45,7 +51,7 @@ const feedbackSchema = new mongoose.Schema({
 // Mongoose Model
 const Feedback = mongoose.model("Feedback", feedbackSchema);
 
-// POST: Save feedback
+// 1. POST: Save feedback (CREATE)
 app.post("/api/feedback", async (req, res) => {
   try {
     const { name, rating, comment } = req.body;
@@ -68,7 +74,7 @@ app.post("/api/feedback", async (req, res) => {
   }
 });
 
-// GET: Fetch all feedback
+// 2. GET: Fetch all feedback (READ)
 app.get("/api/feedback", async (req, res) => {
   try {
     const feedbacks = await Feedback.find().sort({ date: -1 });
@@ -78,6 +84,48 @@ app.get("/api/feedback", async (req, res) => {
     res.status(500).json({
       error: "Failed to fetch feedbacks",
     });
+  }
+});
+
+// 3. PUT: Update an existing feedback by ID (UPDATE)
+app.put("/api/feedback/:id", async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    
+    // Mongoose query method matching by MongoDB _id
+    const updatedFeedback = await Feedback.findByIdAndUpdate(
+      req.params.id,
+      { rating, comment },
+      { new: true, runValidators: true } // {new: true} se updated data return hota hai
+    );
+
+    if (!updatedFeedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    res.status(200).json({
+      message: "Feedback updated successfully!",
+      updatedFeedback
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update feedback" });
+  }
+});
+
+// 4. DELETE: Delete a feedback by ID (DELETE)
+app.delete("/api/feedback/:id", async (req, res) => {
+  try {
+    const deletedFeedback = await Feedback.findByIdAndDelete(req.params.id);
+
+    if (!deletedFeedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    res.status(200).json({
+      message: "Feedback deleted successfully!"
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete feedback" });
   }
 });
 
